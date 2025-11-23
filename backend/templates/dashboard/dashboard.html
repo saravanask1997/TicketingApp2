@@ -454,12 +454,13 @@
 <script>
 // Status Chart
 const statusCtx = document.getElementById('statusChart').getContext('2d');
+const statusData = {{ status_counts|safe }};
 const statusChart = new Chart(statusCtx, {
     type: 'doughnut',
     data: {
-        labels: {{ status_counts|mapattr:'status'|safe }},
+        labels: statusData.map(item => item.status),
         datasets: [{
-            data: {{ status_counts|mapattr:'count'|safe }},
+            data: statusData.map(item => item.count),
             backgroundColor: ['#f6c23e', '#36b9cc', '#1cc88a', '#e74a3b'],
         }]
     },
@@ -475,12 +476,13 @@ const statusChart = new Chart(statusCtx, {
 
 // Priority Chart
 const priorityCtx = document.getElementById('priorityChart').getContext('2d');
+const priorityData = {{ priority_counts|safe }};
 const priorityChart = new Chart(priorityCtx, {
     type: 'pie',
     data: {
-        labels: {{ priority_counts|mapattr:'priority'|safe }},
+        labels: priorityData.map(item => item.priority),
         datasets: [{
-            data: {{ priority_counts|mapattr:'count'|safe }},
+            data: priorityData.map(item => item.count),
             backgroundColor: ['#1cc88a', '#36b9cc', '#f6c23e', '#e74a3b'],
         }]
     },
