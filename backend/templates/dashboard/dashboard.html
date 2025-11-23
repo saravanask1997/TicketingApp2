@@ -1,0 +1,507 @@
+{% extends 'base.html' %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+    <h1 class="h2">
+        {% if dashboard_type == 'admin' %}
+            <i class="bi bi-speedometer2"></i> Admin Dashboard
+        {% elif dashboard_type == 'automation_team' %}
+            <i class="bi bi-gear"></i> Automation Team Dashboard
+        {% else %}
+            <i class="bi bi-person"></i> My Dashboard
+        {% endif %}
+    </h1>
+</div>
+
+<!-- Admin Dashboard -->
+{% if dashboard_type == 'admin' %}
+<!-- Stats Cards -->
+<div class="row mb-4">
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card border-left-primary shadow h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Total Tickets</div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">{{ total_tickets }}</div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="bi bi-ticket-detailed fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card border-left-warning shadow h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">Open Tickets</div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">{{ open_tickets }}</div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="bi bi-clock-history fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card border-left-info shadow h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-info text-uppercase mb-1">In Progress</div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">{{ in_progress_tickets }}</div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="bi bi-gear fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card border-left-success shadow h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-success text-uppercase mb-1">Closed Tickets</div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">{{ closed_tickets }}</div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="bi bi-check-circle fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Charts Row -->
+<div class="row mb-4">
+    <div class="col-xl-8 col-lg-7">
+        <div class="card shadow mb-4">
+            <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                <h6 class="m-0 font-weight-bold text-primary">Ticket Status Breakdown</h6>
+            </div>
+            <div class="card-body">
+                <canvas id="statusChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-4 col-lg-5">
+        <div class="card shadow mb-4">
+            <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                <h6 class="m-0 font-weight-bold text-primary">Priority Distribution</h6>
+            </div>
+            <div class="card-body">
+                <canvas id="priorityChart"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Recent Tickets Table -->
+<div class="card shadow mb-4">
+    <div class="card-header py-3">
+        <h6 class="m-0 font-weight-bold text-primary">Recent Tickets</h6>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th>Title</th>
+                        <th>Created By</th>
+                        <th>Assigned To</th>
+                        <th>Status</th>
+                        <th>Priority</th>
+                        <th>Created</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for ticket in recent_tickets %}
+                    <tr>
+                        <td>
+                            <a href="{% url 'tickets:detail' ticket.id %}">{{ ticket.title }}</a>
+                        </td>
+                        <td>{{ ticket.created_by.get_full_name|default:ticket.created_by.email }}</td>
+                        <td>
+                            {% if ticket.assigned_to %}
+                                {{ ticket.assigned_to.get_full_name|default:ticket.assigned_to.email }}
+                            {% else %}
+                                <span class="text-muted">Unassigned</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <span class="badge bg-{{ ticket.status|yesno:'warning,info,success,secondary' }}">
+                                {{ ticket.get_status_display }}
+                            </span>
+                        </td>
+                        <td>
+                            <span class="badge bg-{{ ticket.priority|yesno:'success,info,warning,danger' }}">
+                                {{ ticket.get_priority_display }}
+                            </span>
+                        </td>
+                        <td>{{ ticket.created_at|date:"M d, Y" }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="6" class="text-center text-muted">No tickets found</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Automation Team Dashboard -->
+{% elif dashboard_type == 'automation_team' %}
+<!-- My Stats Cards -->
+<div class="row mb-4">
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card border-left-info shadow h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-info text-uppercase mb-1">Assigned to Me</div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">
+                            {{ my_open_tickets|add:my_in_progress_tickets }}
+                        </div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="bi bi-person-check fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card border-left-warning shadow h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">Open</div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">{{ my_open_tickets }}</div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="bi bi-clock-history fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card border-left-primary shadow h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">In Progress</div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">{{ my_in_progress_tickets }}</div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="bi bi-gear fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card border-left-danger shadow h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-danger text-uppercase mb-1">Overdue</div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">{{ overdue_tickets_count }}</div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="bi bi-exclamation-triangle fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Overdue Tickets Alert -->
+{% if overdue_tickets %}
+<div class="alert alert-danger">
+    <h6><i class="bi bi-exclamation-triangle"></i> Overdue Tickets</h6>
+    <p class="mb-0">You have {{ overdue_tickets_count }} overdue ticket(s) that need attention.</p>
+</div>
+{% endif %}
+
+<!-- Recent Assigned Tickets -->
+<div class="card shadow mb-4">
+    <div class="card-header py-3">
+        <h6 class="m-0 font-weight-bold text-primary">My Assigned Tickets</h6>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th>Title</th>
+                        <th>Created By</th>
+                        <th>Status</th>
+                        <th>Priority</th>
+                        <th>Due Date</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for ticket in recent_assigned_tickets %}
+                    <tr class="{% if ticket.is_overdue %}table-danger{% endif %}">
+                        <td>
+                            <a href="{% url 'tickets:detail' ticket.id %}">{{ ticket.title }}</a>
+                        </td>
+                        <td>{{ ticket.created_by.get_full_name|default:ticket.created_by.email }}</td>
+                        <td>
+                            <span class="badge bg-{{ ticket.status|yesno:'warning,info,success,secondary' }}">
+                                {{ ticket.get_status_display }}
+                            </span>
+                        </td>
+                        <td>
+                            <span class="badge bg-{{ ticket.priority|yesno:'success,info,warning,danger' }}">
+                                {{ ticket.get_priority_display }}
+                            </span>
+                        </td>
+                        <td>
+                            {% if ticket.due_date %}
+                                {{ ticket.due_date|date:"M d, Y" }}
+                                {% if ticket.is_overdue %}
+                                    <i class="bi bi-exclamation-triangle text-danger" title="Overdue"></i>
+                                {% endif %}
+                            {% else %}
+                                <span class="text-muted">No due date</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <a href="{% url 'tickets:detail' ticket.id %}" class="btn btn-sm btn-outline-primary">
+                                <i class="bi bi-eye"></i> View
+                            </a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="6" class="text-center text-muted">No tickets assigned to you</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Regular User Dashboard -->
+{% else %}
+<!-- My Stats Cards -->
+<div class="row mb-4">
+    <div class="col-xl-4 col-md-6 mb-4">
+        <div class="card border-left-primary shadow h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">My Tickets</div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">
+                            {{ my_open_tickets|add:my_in_progress_tickets|add:my_closed_tickets }}
+                        </div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="bi bi-ticket-detailed fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-4 col-md-6 mb-4">
+        <div class="card border-left-warning shadow h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">Open</div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">{{ my_open_tickets }}</div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="bi bi-clock-history fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-4 col-md-6 mb-4">
+        <div class="card border-left-success shadow h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-success text-uppercase mb-1">Closed</div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">{{ my_closed_tickets }}</div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="bi bi-check-circle fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Quick Actions -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h6 class="m-0 font-weight-bold text-primary">Quick Actions</h6>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-3 mb-3">
+                        <a href="{% url 'tickets:create' %}" class="btn btn-primary w-100">
+                            <i class="bi bi-plus-circle"></i> Create New Ticket
+                        </a>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <a href="{% url 'tickets:my_tickets' %}" class="btn btn-outline-primary w-100">
+                            <i class="bi bi-ticket-detailed"></i> View My Tickets
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Recent Tickets -->
+<div class="card shadow mb-4">
+    <div class="card-header py-3">
+        <h6 class="m-0 font-weight-bold text-primary">My Recent Tickets</h6>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th>Title</th>
+                        <th>Assigned To</th>
+                        <th>Status</th>
+                        <th>Priority</th>
+                        <th>Created</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for ticket in recent_tickets %}
+                    <tr>
+                        <td>
+                            <a href="{% url 'tickets:detail' ticket.id %}">{{ ticket.title }}</a>
+                        </td>
+                        <td>
+                            {% if ticket.assigned_to %}
+                                {{ ticket.assigned_to.get_full_name|default:ticket.assigned_to.email }}
+                            {% else %}
+                                <span class="text-muted">Unassigned</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <span class="badge bg-{{ ticket.status|yesno:'warning,info,success,secondary' }}">
+                                {{ ticket.get_status_display }}
+                            </span>
+                        </td>
+                        <td>
+                            <span class="badge bg-{{ ticket.priority|yesno:'success,info,warning,danger' }}">
+                                {{ ticket.get_priority_display }}
+                            </span>
+                        </td>
+                        <td>{{ ticket.created_at|date:"M d, Y" }}</td>
+                        <td>
+                            <a href="{% url 'tickets:detail' ticket.id %}" class="btn btn-sm btn-outline-primary">
+                                <i class="bi bi-eye"></i> View
+                            </a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="6" class="text-center text-muted">
+                            You haven't created any tickets yet.
+                            <a href="{% url 'tickets:create' %}">Create your first ticket</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<!-- Chart.js -->
+{% if dashboard_type == 'admin' %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+// Status Chart
+const statusCtx = document.getElementById('statusChart').getContext('2d');
+const statusChart = new Chart(statusCtx, {
+    type: 'doughnut',
+    data: {
+        labels: {{ status_counts|mapattr:'status'|safe }},
+        datasets: [{
+            data: {{ status_counts|mapattr:'count'|safe }},
+            backgroundColor: ['#f6c23e', '#36b9cc', '#1cc88a', '#e74a3b'],
+        }]
+    },
+    options: {
+        responsive: true,
+        plugins: {
+            legend: {
+                position: 'bottom',
+            }
+        }
+    }
+});
+
+// Priority Chart
+const priorityCtx = document.getElementById('priorityChart').getContext('2d');
+const priorityChart = new Chart(priorityCtx, {
+    type: 'pie',
+    data: {
+        labels: {{ priority_counts|mapattr:'priority'|safe }},
+        datasets: [{
+            data: {{ priority_counts|mapattr:'count'|safe }},
+            backgroundColor: ['#1cc88a', '#36b9cc', '#f6c23e', '#e74a3b'],
+        }]
+    },
+    options: {
+        responsive: true,
+        plugins: {
+            legend: {
+                position: 'bottom',
+            }
+        }
+    }
+});
+</script>
+{% endif %}
+
+<!-- Custom CSS for border-left utilities -->
+<style>
+.border-left-primary { border-left: 0.25rem solid #4e73df !important; }
+.border-left-success { border-left: 0.25rem solid #1cc88a !important; }
+.border-left-info { border-left: 0.25rem solid #36b9cc !important; }
+.border-left-warning { border-left: 0.25rem solid #f6c23e !important; }
+.border-left-danger { border-left: 0.25rem solid #e74a3b !important; }
+</style>
+{% endblock %}
