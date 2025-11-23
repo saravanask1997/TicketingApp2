@@ -106,3 +106,19 @@ def send_status_update_notification(ticket_id, old_status, new_status, changed_b
         return f"Ticket or user not found for ticket {ticket_id}"
     except Exception as e:
         return f"Failed to send status update notification: {str(e)}"
+
+
+@shared_task
+def cleanup_old_notifications():
+    """Clean up old notifications (older than 90 days)"""
+    from django.utils import timezone
+    from datetime import timedelta
+
+    cutoff_date = timezone.now() - timedelta(days=90)
+
+    deleted_count = Notification.objects.filter(
+        created_at__lt=cutoff_date,
+        is_read=True
+    ).delete()[0]
+
+    return f"Cleaned up {deleted_count} old notifications"
