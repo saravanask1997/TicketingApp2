@@ -1,0 +1,50 @@
+{% extends 'emails/base_email.html' %}
+
+{% block email_content %}
+<h2>{{ notification.title }}</h2>
+
+<p>Hello {{ notification.user.get_full_name|default:notification.user.email }},</p>
+
+<p>{{ notification.message }}</p>
+
+{% if ticket %}
+<div class="ticket-info">
+    <h3>Ticket Details</h3>
+    <p><strong>Title:</strong> {{ ticket.title }}</p>
+    <p><strong>ID:</strong> {{ ticket.id }}</p>
+    <p><strong>Category:</strong> {{ ticket.get_category_display }}</p>
+    <p><strong>Priority:</strong>
+        <span class="status-badge priority-{{ ticket.priority }}">{{ ticket.get_priority_display }}</span>
+    </p>
+    <p><strong>Status:</strong>
+        <span class="status-badge status-{{ ticket.status }}">{{ ticket.get_status_display }}</span>
+    </p>
+    {% if ticket.assigned_to %}
+        <p><strong>Assigned To:</strong> {{ ticket.assigned_to.get_full_name|default:ticket.assigned_to.email }}</p>
+    {% endif %}
+    <p><strong>Created:</strong> {{ ticket.created_at|date:"F d, Y" }} at {{ ticket.created_at|time:"g:i A" }}</p>
+    {% if ticket.due_date %}
+        <p><strong>Due Date:</strong> {{ ticket.due_date|date:"F d, Y" }}</p>
+    {% endif %}
+</div>
+
+<div style="margin: 20px 0; padding: 15px; background-color: #f8f9fc; border-radius: 6px;">
+    <h4>Description:</h4>
+    <p>{{ ticket.description|linebreaks }}</p>
+</div>
+{% endif %}
+
+<div style="text-align: center; margin: 20px 0;">
+    {% if ticket %}
+        <a href="#" class="btn">View Ticket Details</a>
+    {% else %}
+        <a href="#" class="btn">Go to Dashboard</a>
+    {% endif %}
+</div>
+
+<hr style="border: none; border-top: 1px solid #e3e6f0; margin: 20px 0;">
+
+<p style="font-size: 14px; color: #858796;">
+    <strong>Note:</strong> This is an automated notification. You can manage your notification preferences in your profile settings.
+</p>
+{% endblock %}
