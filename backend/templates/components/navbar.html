@@ -1,0 +1,103 @@
+{% load static %}
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary sticky-top">
+    <div class="container">
+        <a class="navbar-brand" href="{% url 'dashboard:home' %}">
+            <i class="bi bi-headset"></i> Ticketing System
+        </a>
+
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav me-auto">
+                {% if user.is_authenticated %}
+                    <!-- Dashboard -->
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'dashboard:home' %}">
+                            <i class="bi bi-speedometer2"></i> Dashboard
+                        </a>
+                    </li>
+
+                    <!-- Tickets -->
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="ticketsDropdown" role="button" data-bs-toggle="dropdown">
+                            <i class="bi bi-ticket-detailed"></i> Tickets
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="{% url 'tickets:list' %}">All Tickets</a></li>
+                            <li><a class="dropdown-item" href="{% url 'tickets:my_tickets' %}">My Tickets</a></li>
+                            {% if user.is_admin or user.is_automation_team %}
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item" href="{% url 'tickets:create' %}">
+                                    <i class="bi bi-plus-circle"></i> Create Ticket
+                                </a></li>
+                            {% endif %}
+                        </ul>
+                    </li>
+
+                    <!-- Admin Menu -->
+                    {% if user.is_admin %}
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="adminDropdown" role="button" data-bs-toggle="dropdown">
+                                <i class="bi bi-gear"></i> Admin
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="{% url 'dashboard:analytics' %}">Analytics</a></li>
+                                <li><a class="dropdown-item" href="{% url 'dashboard:user_management' %}">User Management</a></li>
+                                <li><a class="dropdown-item" href="/admin/">Django Admin</a></li>
+                            </ul>
+                        </li>
+                    {% endif %}
+                {% endif %}
+            </ul>
+
+            <!-- User Menu -->
+            <ul class="navbar-nav">
+                {% if user.is_authenticated %}
+                    <!-- Notifications -->
+                    <li class="nav-item dropdown position-relative">
+                        <a class="nav-link dropdown-toggle" href="#" id="notificationDropdown" role="button" data-bs-toggle="dropdown">
+                            <i class="bi bi-bell"></i>
+                            <span class="notification-badge badge bg-danger rounded-pill" id="notificationCount">0</span>
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end" style="min-width: 300px;" id="notificationList">
+                            <!-- Notifications will be loaded here -->
+                        </ul>
+                    </li>
+
+                    <!-- User Profile -->
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown">
+                            <i class="bi bi-person-circle"></i>
+                            {{ user.get_full_name|default:user.email }}
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li><a class="dropdown-item" href="{% url 'users:profile' %}">
+                                <i class="bi bi-person"></i> Profile
+                            </a></li>
+                            <li><a class="dropdown-item" href="{% url 'users:profile_edit' %}">
+                                <i class="bi bi-pencil"></i> Edit Profile
+                            </a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="{% url 'users:logout' %}">
+                                <i class="bi bi-box-arrow-right"></i> Logout
+                            </a></li>
+                        </ul>
+                    </li>
+                {% else %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'users:login' %}">
+                            <i class="bi bi-box-arrow-in-right"></i> Login
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'users:register' %}">
+                            <i class="bi bi-person-plus"></i> Register
+                        </a>
+                    </li>
+                {% endif %}
+            </ul>
+        </div>
+    </div>
+</nav>
