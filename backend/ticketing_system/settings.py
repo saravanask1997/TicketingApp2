@@ -4,9 +4,13 @@ Django settings for ticketing_system project.
 
 import os
 from pathlib import Path
+import dj_database_url
+from dotenv import load_dotenv
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+load_dotenv(os.path.join(BASE_DIR, '.env'))
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-your-secret-key-here-change-in-production')
@@ -26,7 +30,6 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     # Third-party apps
-    'bootstrap5',
     'widget_tweaks',
     'django_extensions',
 
@@ -45,6 +48,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
 ]
 
 ROOT_URLCONF = 'ticketing_system.urls'
@@ -69,14 +73,9 @@ WSGI_APPLICATION = 'ticketing_system.wsgi.application'
 
 # Database
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.getenv('DB_NAME', 'ticketing_system'),
-        'USER': os.getenv('DB_USER', 'postgres'),
-        'PASSWORD': os.getenv('DB_PASSWORD', 'password'),
-        'HOST': os.getenv('DB_HOST', 'localhost'),
-        'PORT': os.getenv('DB_PORT', '5432'),
-    }
+    'default':
+        dj_database_url.config(default=os.getenv('DATABASE_URL'), conn_max_age=600,ssl_require=True)
+
 }
 
 # Custom User Model
