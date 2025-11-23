@@ -1,0 +1,33 @@
+TICKETING SYSTEM NOTIFICATION
+================================
+
+{{ notification.title }}
+
+Hello {{ notification.user.get_full_name|default:notification.user.email }},
+
+{{ notification.message }}
+
+{% if ticket %}
+TICKET DETAILS
+--------------
+Title: {{ ticket.title }}
+ID: {{ ticket.id }}
+Category: {{ ticket.get_category_display }}
+Priority: {{ ticket.get_priority_display }}
+Status: {{ ticket.get_status_display }}
+Created: {{ ticket.created_at|date:"F d, Y" }} at {{ ticket.created_at|time:"g:i A" }}
+{% if ticket.assigned_to %}
+Assigned To: {{ ticket.assigned_to.get_full_name|default:ticket.assigned_to.email }}
+{% endif %}
+{% if ticket.due_date %}
+Due Date: {{ ticket.due_date|date:"F d, Y" }}
+{% endif %}
+
+DESCRIPTION
+-----------
+{{ ticket.description }}
+{% endif %}
+
+---
+This is an automated notification from the Ticketing System.
+If you have questions, please contact the automation team.
