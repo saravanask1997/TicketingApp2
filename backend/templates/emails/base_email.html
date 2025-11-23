@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ subject|default:"Ticketing System Notification" }}</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f8f9fc;
+        }
+        .container {
+            background-color: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        .header {
+            background-color: #4e73df;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 24px;
+            font-weight: 600;
+        }
+        .content {
+            padding: 30px 20px;
+        }
+        .footer {
+            background-color: #f8f9fc;
+            padding: 20px;
+            text-align: center;
+            border-top: 1px solid #e3e6f0;
+            color: #858796;
+            font-size: 14px;
+        }
+        .btn {
+            display: inline-block;
+            padding: 12px 24px;
+            background-color: #4e73df;
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            font-weight: 500;
+            margin: 15px 0;
+        }
+        .btn:hover {
+            background-color: #2e59d9;
+        }
+        .ticket-info {
+            background-color: #f8f9fc;
+            padding: 15px;
+            border-radius: 6px;
+            margin: 15px 0;
+            border-left: 4px solid #4e73df;
+        }
+        .status-badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        .status-open { background-color: #f6c23e; color: #fff; }
+        .status-in_progress { background-color: #36b9cc; color: #fff; }
+        .status-delivered { background-color: #1cc88a; color: #fff; }
+        .status-closed { background-color: #858796; color: #fff; }
+        .priority-low { background-color: #1cc88a; color: #fff; }
+        .priority-medium { background-color: #36b9cc; color: #fff; }
+        .priority-high { background-color: #f6c23e; color: #fff; }
+        .priority-urgent { background-color: #e74a3b; color: #fff; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>
+                <i class="bi bi-headset"></i> Ticketing System
+            </h1>
+        </div>
+
+        <div class="content">
+            {% block email_content %}
+            <!-- Email content will be inserted here -->
+            {% endblock %}
+        </div>
+
+        <div class="footer">
+            <p>This is an automated message from the Ticketing System.</p>
+            <p>If you have questions, please contact the automation team.</p>
+            <p>&copy; 2024 Ticketing System. All rights reserved.</p>
+        </div>
+    </div>
+</body>
+</html>
