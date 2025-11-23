@@ -1,0 +1,141 @@
+<!-- Notification Toast -->
+<div class="toast-container position-fixed bottom-0 end-0 p-3" style="z-index: 11">
+    <div id="notificationToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="toast-header">
+            <i class="bi bi-bell-fill text-primary me-2"></i>
+            <strong class="me-auto" id="notificationTitle">Notification</strong>
+            <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+        <div class="toast-body" id="notificationMessage">
+            Notification message here
+        </div>
+    </div>
+</div>
+
+<script>
+// Notification system
+document.addEventListener('DOMContentLoaded', function() {
+    const notificationDropdown = document.getElementById('notificationDropdown');
+    const notificationCount = document.getElementById('notificationCount');
+    const notificationList = document.getElementById('notificationList');
+
+    if (notificationCount) {
+        // Check notifications every 30 seconds
+        setInterval(checkNotifications, 30000);
+        checkNotifications(); // Check immediately on load
+    }
+
+    function checkNotifications() {
+        fetch('/notifications/unread/')
+            .then(response => response.json())
+            .then(data => {
+                updateNotificationBadge(data.count);
+                if (data.count > 0) {
+                    loadNotificationList();
+                }
+            })
+            .catch(error => console.error('Error checking notifications:', error));
+    }
+
+    function updateNotificationBadge(count) {
+        if (notificationCount) {
+            notificationCount.textContent = count;
+            notificationCount.style.display = count > 0 ? 'inline' : 'none';
+        }
+    }
+
+    function loadNotificationList() {
+        fetch('/notifications/list/')
+            .then(response => response.json())
+            .then(data => {
+                if (notificationList && data.notifications.length > 0) {
+                    notificationList.innerHTML = '';
+
+                    data.notifications.forEach(notification => {
+                        const item = document.createElement('li');
+                        item.className = 'notification-item dropdown-item';
+                        item.innerHTML = `
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div class="flex-grow-1">
+                                    <strong>${notification.title}</strong>
+                                    <p class="mb-1 small text-muted">${notification.message}</p>
+                                    <small class="text-muted">${new Date(notification.created_at).toLocaleString()}</small>
+                                </div>
+                                ${!notification.is_read ? '<span class="badge bg-primary">New</span>' : ''}
+                            </div>
+                        `;
+
+                        if (!notification.is_read) {
+                            item.addEventListener('click', function() {
+                                markAsRead(notification.id);
+                            });
+                        }
+
+                        notificationList.appendChild(item);
+                    });
+
+                    // Add "Mark all as read" option
+                    const divider = document.createElement('li');
+                    divider.innerHTML = '<hr class="dropdown-divider">';
+                    notificationList.appendChild(divider);
+
+                    const markAllRead = document.createElement('li');
+                    markAllRead.innerHTML = '<a class="dropdown-item" href="#" onclick="markAllAsRead()">Mark all as read</a>';
+                    notificationList.appendChild(markAllRead);
+                }
+            })
+            .catch(error => console.error('Error loading notifications:', error));
+    }
+
+    window.markAsRead = function(notificationId) {
+        fetch(`/notifications/mark-read/${notificationId}/`, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': getCookie('csrftoken'),
+                'Content-Type': 'application/json',
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                checkNotifications(); // Refresh count
+            }
+        })
+        .catch(error => console.error('Error marking notification as read:', error));
+    };
+
+    window.markAllAsRead = function() {
+        fetch('/notifications/mark-all-read/', {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': getCookie('csrftoken'),
+                'Content-Type': 'application/json',
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                checkNotifications(); // Refresh count
+                loadNotificationList(); // Refresh list
+            }
+        })
+        .catch(error => console.error('Error marking all notifications as read:', error));
+    };
+
+    // Helper function to get CSRF token
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+});
+</script>
