@@ -1,0 +1,271 @@
+/* Custom CSS for Ticketing System */
+
+/* Override Bootstrap variables */
+:root {
+    --primary-color: #4e73df;
+    --secondary-color: #858796;
+    --success-color: #1cc88a;
+    --info-color: #36b9cc;
+    --warning-color: #f6c23e;
+    --danger-color: #e74a3b;
+    --light-color: #f8f9fc;
+    --dark-color: #5a5c69;
+}
+
+/* General Styles */
+body {
+    font-family: 'Nunito', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    background-color: #f8f9fc;
+}
+
+/* Navbar Styles */
+.navbar-brand {
+    font-weight: 700;
+    font-size: 1.2rem;
+}
+
+.navbar-nav .nav-link {
+    font-weight: 500;
+}
+
+/* Notification Badge */
+.notification-badge {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    font-size: 0.7rem;
+    min-width: 18px;
+    height: 18px;
+    padding: 0 4px;
+}
+
+/* Card Styles */
+.card {
+    border: none;
+    border-radius: 0.35rem;
+    box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
+    transition: all 0.3s ease-in-out;
+}
+
+.card:hover {
+    box-shadow: 0 0.25rem 2rem 0 rgba(58, 59, 69, 0.2);
+}
+
+.card-header {
+    background-color: #fff;
+    border-bottom: 1px solid #e3e6f0;
+    font-weight: 700;
+    color: var(--dark-color);
+}
+
+/* Table Styles */
+.table {
+    background-color: #fff;
+}
+
+.table th {
+    border-top: none;
+    font-weight: 700;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    background-color: #f8f9fc;
+}
+
+.table-hover tbody tr:hover {
+    background-color: #f8f9fc;
+}
+
+/* Form Styles */
+.form-control {
+    border: 1px solid #d1d3e2;
+    border-radius: 0.35rem;
+    transition: all 0.3s ease-in-out;
+}
+
+.form-control:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 0.2rem rgba(78, 115, 223, 0.25);
+}
+
+.form-select {
+    border: 1px solid #d1d3e2;
+    border-radius: 0.35rem;
+    transition: all 0.3s ease-in-out;
+}
+
+.form-select:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 0.2rem rgba(78, 115, 223, 0.25);
+}
+
+/* Button Styles */
+.btn {
+    border-radius: 0.35rem;
+    font-weight: 500;
+    transition: all 0.3s ease-in-out;
+}
+
+.btn-primary {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+}
+
+.btn-primary:hover {
+    background-color: #2e59d9;
+    border-color: #2653d4;
+}
+
+.btn-success {
+    background-color: var(--success-color);
+    border-color: var(--success-color);
+}
+
+.btn-warning {
+    background-color: var(--warning-color);
+    border-color: var(--warning-color);
+}
+
+.btn-danger {
+    background-color: var(--danger-color);
+    border-color: var(--danger-color);
+}
+
+/* Badge Styles */
+.badge {
+    font-size: 0.75rem;
+    font-weight: 500;
+}
+
+/* Alert Styles */
+.alert {
+    border: none;
+    border-radius: 0.35rem;
+    font-weight: 500;
+}
+
+/* Pagination Styles */
+.pagination .page-link {
+    border: none;
+    margin: 0 2px;
+    border-radius: 0.35rem;
+    color: var(--primary-color);
+    font-weight: 500;
+}
+
+.pagination .page-item.active .page-link {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+}
+
+/* Status Badge Colors */
+.badge.bg-open { background-color: var(--warning-color) !important; }
+.badge.bg-in_progress { background-color: var(--info-color) !important; }
+.badge.bg-delivered { background-color: var(--success-color) !important; }
+.badge.bg-closed { background-color: var(--secondary-color) !important; }
+
+/* Priority Badge Colors */
+.badge.bg-low { background-color: var(--success-color) !important; }
+.badge.bg-medium { background-color: var(--info-color) !important; }
+.badge.bg-high { background-color: var(--warning-color) !important; }
+.badge.bg-urgent { background-color: var(--danger-color) !important; }
+
+/* Notification Styles */
+.notification-item {
+    cursor: pointer;
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid #e3e6f0;
+    transition: background-color 0.2s ease-in-out;
+}
+
+.notification-item:hover {
+    background-color: #f8f9fc;
+}
+
+.notification-item:last-child {
+    border-bottom: none;
+}
+
+/* Footer Styles */
+footer {
+    background-color: var(--dark-color) !important;
+    color: #fff;
+}
+
+footer a {
+    color: #fff;
+    opacity: 0.8;
+    transition: opacity 0.3s ease-in-out;
+}
+
+footer a:hover {
+    opacity: 1;
+    color: #fff;
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+    .container-fluid {
+        padding-left: 15px;
+        padding-right: 15px;
+    }
+
+    .card-body {
+        padding: 1rem;
+    }
+
+    .table-responsive {
+        font-size: 0.875rem;
+    }
+
+    .btn-sm {
+        font-size: 0.75rem;
+        padding: 0.25rem 0.5rem;
+    }
+
+    .navbar-nav .nav-link {
+        padding: 0.5rem 1rem;
+    }
+}
+
+/* Loading Spinner */
+.spinner-border-sm {
+    width: 1rem;
+    height: 1rem;
+}
+
+/* Chart Container */
+.chart-container {
+    position: relative;
+    height: 300px;
+    width: 100%;
+}
+
+/* Custom Animations */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.fade-in {
+    animation: fadeIn 0.5s ease-in-out;
+}
+
+/* Scrollbar Styles */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #555;
+}
