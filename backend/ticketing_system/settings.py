@@ -73,9 +73,15 @@ WSGI_APPLICATION = 'ticketing_system.wsgi.application'
 
 # Database
 DATABASES = {
-    'default':
-        dj_database_url.config(default=os.getenv('DATABASE_URL'), conn_max_age=600,ssl_require=True)
-
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': os.getenv('PGDATABASE'),
+        'USER': os.getenv('PGUSER'),
+        'PASSWORD': os.getenv('PGPASSWORD'),
+        'HOST': os.getenv('PGHOST'),
+        'PORT': os.getenv('PGPORT', '5432'),
+        'CONN_MAX_AGE': 600,
+    }
 }
 
 # Custom User Model
@@ -154,6 +160,7 @@ CELERY_TIMEZONE = 'UTC'
 
 # Security settings (for production)
 if not DEBUG:
+    DATABASES['default']['OPTIONS'] = {'sslmode': 'require'}
     SECURE_BROWSER_XSS_FILTER = True
     SECURE_CONTENT_TYPE_NOSNIFF = True
     X_FRAME_OPTIONS = 'DENY'
