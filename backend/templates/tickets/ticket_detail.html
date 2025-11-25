@@ -9,7 +9,7 @@
         <i class="bi bi-ticket-detailed"></i> {{ ticket.title }}
     </h1>
     <div class="btn-toolbar">
-        {% if ticket.can_be_edited_by user %}
+        {% if user.is_admin or user.is_automation_team %}
             <div class="btn-group me-2">
                 <a href="{% url 'tickets:edit' ticket.id %}" class="btn btn-outline-primary">
                     <i class="bi bi-pencil"></i> Edit Ticket
@@ -121,7 +121,7 @@
         </div>
 
         <!-- Admin/Automation Team Actions -->
-        {% if ticket.can_be_edited_by user %}
+        {% if user.is_admin or user.is_automation_team %}
         <div class="card shadow mb-4">
             <div class="card-header">
                 <h6 class="mb-0">Quick Actions</h6>

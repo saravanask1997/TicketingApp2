@@ -171,7 +171,7 @@
                                 <a href="{% url 'tickets:detail' ticket.id %}" class="btn btn-sm btn-outline-primary" title="View">
                                     <i class="bi bi-eye"></i>
                                 </a>
-                                {% if ticket.can_be_edited_by user %}
+                                {% if user.is_admin or user.is_automation_team %}
                                     <a href="{% url 'tickets:edit' ticket.id %}" class="btn btn-sm btn-outline-secondary" title="Edit">
                                         <i class="bi bi-pencil"></i>
                                     </a>

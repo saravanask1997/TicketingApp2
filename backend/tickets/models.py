@@ -26,6 +26,7 @@ class Ticket(models.Model):
         ('bug_report', 'Bug Report'),
         ('feature_request', 'Feature Request'),
         ('maintenance', 'Maintenance'),
+        ('wfm_requests', 'WFM requests'),
         ('other', 'Other'),
     ]
 
